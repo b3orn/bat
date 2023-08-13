@@ -1,0 +1,16 @@
+#ifndef BAT_CONSTS_H
+#define BAT_CONSTS_H
+
+#define BAT_MIDDLE_A 69
+#define BAT_PITCH_A440 440
+
+#define BAT_SHORTEST_NOTE 128
+#define BAT_LOWEST_LEVEL 0.0001
+
+#define BAT_DEFAULT_SAMPLE_RATE 48000
+
+
+#define BAT_OK 0
+#define BAT_ERR 1
+
+#endif 
