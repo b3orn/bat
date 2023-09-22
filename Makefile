@@ -1,6 +1,4 @@
 CC = clang
-LD = ld
-AR = ar
 
 CCFLAGS = \
 	-Wall -Wextra -Weverything -std=c11 -pedantic -fPIC \
@@ -8,50 +6,32 @@ CCFLAGS = \
 	-Wno-poison-system-directories \
 	-O0 -g
 
-LDFLAGS = -macosx_version_min 13.0 \
-	-arch x86_64 \
-	-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib \
-	-lSystem
+LDFLAGS = -arch x86_64
 
 INCLUDE_DIR = include
 SRC_DIR = src
-OBJECT_DIR = $(BUILD_DIR)
+BUILD_DIR = build
 
-OBJECT_FILES = $(shell find $(SRC_DIR) -name '*.c' -exec echo {} \; | sed 's/\.c/\.o/')
+OBJECT_FILES = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(wildcard $(SRC_DIR)/*.c))
+INCLUDE_FILES = $(wildcard $(INCLUDE_DIR)/%.h)
 
-INCLUDE_FILES = $(shell find $(INCLUDE_DIR) -name '*.h')
-
-TARGET=bat
+TARGET = bat
 
 
 .PHONY: all clean
 
 
-all: $(TARGET)  # lib$(TARGET).dylib lib$(TARGET).a
+all: $(BUILD_DIR)/$(TARGET)
 
 
 clean:
-	-rm $(OBJECT_FILES)
-	#-rm lib$(TARGET).dylib
-	#-rm lib$(TARGET).a
-	-rm $(TARGET)
+	-rm -rf $(BUILD_DIR)
 
 
-#lib$(TARGET).dylib: $(filter-out $(SRC_DIR)/$(TARGET).o,$(OBJECT_FILES))
-#	$(LD) $(LDFLAGS) -dylib -o $@ $+
+$(BUILD_DIR)/$(TARGET): $(OBJECT_FILES)
+	$(CC) $(LDFLAGS) -o $@ $^
 
 
-#lib$(TARGET).a: $(filter-out $(SRC_DIR)/$(TARGET).o,$(OBJECT_FILES))
-#	$(AR) rcs $@ $+
-
-
-#$(TARGET): libbat.dylib $(SRC_DIR)/$(TARGET).o
-#	$(LD) $(LDFLAGS) -execute -L. -l$(TARGET) -o $@ $(SRC_DIR)/$(TARGET).o
-
-
-$(TARGET): $(OBJECT_FILES)
-	$(CC) -o $@ $+
-
-
-$(SRC_DIR)/%.o: $(SRC_DIR)/%.c $(INCLUDE_FILES)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(INCLUDE_FILES)
+	mkdir -p $(BUILD_DIR)
 	$(CC) $(CCFLAGS) -I$(INCLUDE_DIR) -o $@ -c $<
