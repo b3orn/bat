@@ -12,8 +12,9 @@ INCLUDE_DIR = include
 SRC_DIR = src
 BUILD_DIR = build
 
-OBJECT_FILES = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(wildcard $(SRC_DIR)/*.c))
-INCLUDE_FILES = $(wildcard $(INCLUDE_DIR)/%.h)
+INCLUDE_FILES = $(shell find $(INCLUDE_DIR) -name "*.h")
+SRC_FILES = $(shell find $(SRC_DIR) -name "*.c")
+OBJECT_FILES = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC_FILES))
 
 TARGET = bat
 
@@ -33,5 +34,5 @@ $(BUILD_DIR)/$(TARGET): $(OBJECT_FILES)
 
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(INCLUDE_FILES)
-	mkdir -p $(BUILD_DIR)
+	mkdir -p $(dir $@)
 	$(CC) $(CCFLAGS) -I$(INCLUDE_DIR) -o $@ -c $<
