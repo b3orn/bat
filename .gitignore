@@ -6,3 +6,4 @@
 *.exe
 *.log
 *.wav
+.DS_Store
