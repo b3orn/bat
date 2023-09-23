@@ -1,5 +1,5 @@
 ---
-name: "Build bat"
+name: Build bat
 on:
   push:
     branches:
@@ -9,19 +9,20 @@ permissions:
   id-token: write
 jobs:
   build:
+    name: Build
     strategy:
       matrix:
         include:
           - name: macos-amd64
-            os: macos
+            os: macos-latest
             arch: x64
           - name: macos-arm64
-            os: macos
+            os: macos-latest
             arch: arm64
           - name: linux-amd64
-            os: linux
+            os: linux-latest
             arch: x64
-    runs-on: [${{ matrix.os }}-latest, ${{ matrix.arch }}]
+    runs-on: [${{ matrix.os }}, ${{ matrix.arch }}]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
