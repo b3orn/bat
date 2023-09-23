@@ -14,6 +14,7 @@ extern "C" {
 #include <time.h>
 #include <sys/time.h>
 
+#include "bat/version.h"
 #include "bat/types.h"
 #include "bat/consts.h"
 #include "bat/utils.h"

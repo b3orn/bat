@@ -5,6 +5,13 @@
 
 
 static void usage(char *program) {
+    printf("bat %s (%d) %s-%s", BAT_VERSION, BAT_BUILD_VERSION, BAT_OS, BAT_ARCH);
+#ifdef BAT_DEBUG
+    printf(" debug\n");
+#else
+    printf("\n");
+#endif
+    printf("%s\n", BAT_BUILD_DATE);
     printf("usage: %s input output\n", program);
 }
 
