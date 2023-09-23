@@ -8,27 +8,29 @@ permissions:
   contents: read
   id-token: write
 jobs:
-  build-macos:
-    runs-on: macos-latest
+  build:
+    strategy:
+      matrix:
+        include:
+          - name: macos-amd64
+            os: macos
+            arch: x64
+          - name: macos-arm64
+            os: macos
+            arch: arm64
+          - name: linux-amd64
+            os: linux
+            arch: x64
+    runs-on: [${{ matrix.os }}-latest, ${{ matrix.arch }}]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: "Build"
-        run: make
+        run: make RELEASE=1
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          path: build
-          name: macos
-  build-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: "Build"
-        run: make
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          path: build
-          name: linux
+          name: ${{ matrix.name }}
+          path: |
+            build
+            !build/*/*.o
