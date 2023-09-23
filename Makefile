@@ -24,6 +24,8 @@ OS_ARCH := $(shell uname -m)
 ifeq ($(OS_ARCH),x86_64)
 	TARGET_ARCH := amd64
 	CCFLAGS += -D BAT_ARCH_AMD64
+else
+$(error "Unsupported architecture ${OS_ARCH}")
 endif
 
 OS_NAME := $(shell uname -s)
@@ -36,8 +38,7 @@ ifeq ($(OS_NAME),Darwin)
 	ifeq ($(TARGET_ARCH),amd64)
 		LDFLAGS += -arch x86_64
 	endif
-endif
-ifeq ($(OS_NAME),Linux)
+else ifeq ($(OS_NAME),Linux)
 	TARGET_OS := linux
 	CC := gcc
 	CCFLAGS += -std=gnu11 -D BAT_OS_LINUX
@@ -47,6 +48,8 @@ ifeq ($(OS_NAME),Linux)
 	ifeq ($(TARGET_ARCH),amd64)
 		LDFLAGS += -march=x86_64
 	endif
+else
+$(error "Unsupported operating system ${OS_NAME}")
 endif
 
 BUILD_VERSION := $(shell m4 build_version.m4; cat BUILD_VERSION)
