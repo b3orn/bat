@@ -24,6 +24,12 @@ OS_ARCH := $(shell uname -m)
 ifeq ($(OS_ARCH),x86_64)
 	TARGET_ARCH := amd64
 	CCFLAGS += -D BAT_ARCH_AMD64
+else ifeq ($(OS_ARCH),aarch64)
+	TARGET_ARCH := arm64
+	CCFLAGS += -D BAT_ARCH_ARM64
+else ifeq ($(OS_ARCH),arm64)
+	TARGET_ARCH := arm64
+	CCFLAGS += -D BAT_ARCH_ARM64
 else
 $(error "Unsupported architecture ${OS_ARCH}")
 endif
@@ -32,33 +38,31 @@ OS_NAME := $(shell uname -s)
 ifeq ($(OS_NAME),Darwin)
 	TARGET_OS := macos
 	CC := clang
-	CCFLAGS += -std=c11 -Weverything -D BAT_OS_MACOS
+	CCFLAGS += -std=c11 -Weverything -D BAT_OS_POSIX -D BAT_OS_MACOS
+	LDFLAGS += -arch $(OS_ARCH)
 	LIB_FLAGS += -dynamiclib
 	LIB_EXT := dylib
-	ifeq ($(TARGET_ARCH),amd64)
-		LDFLAGS += -arch x86_64
-	endif
 else ifeq ($(OS_NAME),Linux)
 	TARGET_OS := linux
 	CC := gcc
-	CCFLAGS += -std=gnu11 -D BAT_OS_LINUX
+	CCFLAGS += -std=gnu11 -D BAT_OS_POSIX -D BAT_OS_LINUX
+	LDFLAGS += -march=$(OS_ARCH)
 	LDLIBS += -lm
 	LIB_FLAGS += -shared
 	LIB_EXT := so
-	ifeq ($(TARGET_ARCH),amd64)
-		LDFLAGS += -march=x86_64
-	endif
 else
 $(error "Unsupported operating system ${OS_NAME}")
 endif
 
-BUILD_VERSION := $(shell m4 build_version.m4; cat BUILD_VERSION)
+BUILD_VERSION := $(shell m4 build_version.m4 && cat BUILD_VERSION)
+ifeq ($(BUILD_VERSION),)
+$(error "No build version defined")
+endif
 
 CCFLAGS += \
 	-D BAT_VERSION='"$(shell cat VERSION)"' \
 	-D BAT_BUILD_DATE='"$(shell date)"' \
 	-D BAT_BUILD_VERSION=$(BUILD_VERSION)
-
 
 OBJ_DIR := $(BUILD_DIR)/$(TARGET_OS)-$(TARGET_ARCH)
 BIN_DIR := $(OBJ_DIR)/bin
