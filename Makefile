@@ -99,8 +99,10 @@ wrapper:
 		-DCLAP_WRAPPER_BUILD_AUV2=TRUE \
 		-DCLAP_WRAPPER_OUTPUT_NAME=$(TARGET)
 	cmake --build $(OBJ_DIR)/wrapper
-#	mv $(OBJ_DIR)/wrapper/$(TARGET).vst3 $(OBJ_DIR)
-#	-mv $(OBJ_DIR)/wrapper/$(TARGET).component $(OBJ_DIR)
+	-rm $(OBJ_DIR)/wrapper/cpm
+	-rm $(OBJ_DIR)/wrapper/CMakeFiles
+	-mv $(OBJ_DIR)/wrapper/$(TARGET).vst3 $(OBJ_DIR)
+	-mv $(OBJ_DIR)/wrapper/$(TARGET).component $(OBJ_DIR)
 
 
 build-linux:
