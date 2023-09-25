@@ -24,7 +24,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: "Build"
+        with:
+          submodules: recursive
+      - name: Build
         run: make RELEASE=1
       - name: Upload artifact
         uses: actions/upload-artifact@v3

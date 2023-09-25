@@ -3,7 +3,11 @@ TARGET := bat
 INCLUDE_DIR := include
 SRC_DIR := src
 BUILD_DIR := build
+DEPS_DIR := libs
+DEPS_INCLUDE_DIRS := -I$(DEPS_DIR)/clap/include
 
+
+AR := ar
 
 CCFLAGS := \
 	-pedantic -fPIC \
@@ -71,17 +75,28 @@ LIB_DIR := $(OBJ_DIR)/lib
 INCLUDE_FILES := $(shell find $(INCLUDE_DIR) -name "*.h")
 SRC_FILES := $(shell find $(SRC_DIR) -name "*.c")
 OBJECT_FILES := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
+LIB_OBJECT_FILES := $(filter-out $(OBJ_DIR)/$(TARGET).o,$(OBJECT_FILES))
 
 BIN_TARGET := $(BIN_DIR)/$(TARGET)
-LIB_TARGET := $(LIB_DIR)/lib$(TARGET).$(LIB_EXT)
+LIB_TARGET := $(LIB_DIR)/lib$(TARGET).clap
+STATIC_LIB_TARGET := $(LIB_DIR)/lib$(TARGET).a
 
 
-.PHONY: all clean build-linux
+.PHONY: all clean wrapper build-linux
 
-all: $(BIN_TARGET) $(LIB_TARGET)
+all: $(BIN_TARGET) $(LIB_TARGET) $(STATIC_LIB_TARGET)
 
 clean:
 	-rm -rf $(BUILD_DIR)
+
+wrapper:
+	mkdir -p $(OBJ_DIR)/wrapper
+	cmake \
+		-S $(DEPS_DIR)/clap-wrapper \
+		-B $(OBJ_DIR)/wrapper \
+		-DCLAP_SDK_ROOT=$(DEPS_DIR)/clap \
+		-DVST3_SDK_ROOT=$(DEPS_DIR)/vst3sdk \
+		-DCLAP_WRAPPER_OUTPUT_NAME=$(TARGET)
 
 build-linux:
 	docker build -t $(TARGET) .
@@ -89,16 +104,21 @@ build-linux:
 	docker ps -a -f status=exited -f status=created -f ancestor=$(TARGET) -q | xargs docker rm
 
 
-$(BIN_TARGET): $(OBJ_DIR)/$(TARGET).o $(LIB_TARGET)
+$(BIN_TARGET): $(OBJ_DIR)/$(TARGET).o $(STATIC_LIB_TARGET)
 	mkdir -p $(dir $@)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 
-$(LIB_TARGET): $(filter-out $(OBJ_DIR)/$(TARGET).o,$(OBJECT_FILES))
+$(LIB_TARGET): $(LIB_OBJECT_FILES)
 	mkdir -p $(dir $@)
 	$(CC) $(LDFLAGS) $(LIB_FLAGS) -o $@ $^ $(LDLIBS)
 
 
+$(STATIC_LIB_TARGET): $(LIB_OBJECT_FILES)
+	mkdir -p $(dir $@)
+	$(AR) rcs $@ $^
+
+
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INCLUDE_FILES)
 	mkdir -p $(dir $@)
-	$(CC) $(CCFLAGS) -I$(INCLUDE_DIR) -o $@ -c $<
+	$(CC) $(CCFLAGS) -I$(INCLUDE_DIR) $(DEPS_INCLUDE_DIRS) -o $@ -c $<
