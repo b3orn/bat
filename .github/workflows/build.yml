@@ -37,4 +37,3 @@ jobs:
           path: |
             build
             !build/*/*.o
-            !build/wrapper/**/*
