@@ -36,9 +36,6 @@ jobs:
           name: "${{ matrix.name }}"
           path: |
             build
-            !*.o
-            !build/wrapper/CMakeFiles/
-            !build/wrapper/_deps/
-            !build/wrapper/cpm/
-            !build/wrapper/cmake/
-            !build/wrapper/CPM_modules/
+            !build/**/*.o
+            !build/wrapper/cpm/**/*
+            !build/wrapper/CMakeFiles/**/*
