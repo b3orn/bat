@@ -14,6 +14,10 @@ typedef struct bat_note bat_note_t;
 typedef struct bat_wav_file bat_wav_file_t;
 typedef struct bat_mid_file bat_mid_file_t;
 typedef struct bat_mid_event bat_mid_event_t;
+typedef struct bat_plugin bat_plugin_t;
+typedef struct bat_params bat_params_t;
+typedef struct bat_state bat_state_t;
+typedef struct bat_gui bat_gui_t;
 
 typedef double (bat_osc_waveform_t)(bat_osc_t *osc, bat_note_t *note, double t);
 typedef double (bat_filterfunc_t)(bat_filter_t *filter, bat_note_t *note, double sample);

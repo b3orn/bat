@@ -1,9 +1,9 @@
+#ifndef BAT_H
+#define BAT_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#ifndef BAT_H
-#define BAT_H
 
 #include <math.h>
 #include <stdbool.h>
@@ -13,6 +13,7 @@ extern "C" {
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
+#include <clap/clap.h>
 
 #include "bat/version.h"
 #include "bat/types.h"
@@ -27,9 +28,15 @@ extern "C" {
 #include "bat/mod.h"
 #include "bat/wav.h"
 #include "bat/mid.h"
-
-#endif
+#include "bat/plugin/entry.h"
+#include "bat/plugin/factory.h"
+#include "bat/plugin/plugin.h"
+#include "bat/plugin/params.h"
+#include "bat/plugin/state.h"
+#include "bat/plugin/gui.h"
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
