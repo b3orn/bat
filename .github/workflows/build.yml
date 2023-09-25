@@ -28,6 +28,8 @@ jobs:
           submodules: recursive
       - name: Build
         run: make RELEASE=1
+      - name: Build wrapper
+        run: make RELEASE=1 wrapper
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
@@ -35,3 +37,4 @@ jobs:
           path: |
             build
             !build/*/*.o
+            !build/wrapper/**/*

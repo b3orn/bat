@@ -78,13 +78,13 @@ OBJECT_FILES := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
 LIB_OBJECT_FILES := $(filter-out $(OBJ_DIR)/$(TARGET).o,$(OBJECT_FILES))
 
 BIN_TARGET := $(BIN_DIR)/$(TARGET)
-LIB_TARGET := $(LIB_DIR)/lib$(TARGET).clap
+LIB_TARGET := $(LIB_DIR)/$(TARGET).clap
 STATIC_LIB_TARGET := $(LIB_DIR)/lib$(TARGET).a
 
 
 .PHONY: all clean wrapper build-linux
 
-all: $(BIN_TARGET) $(LIB_TARGET) $(STATIC_LIB_TARGET)
+all: $(LIB_TARGET)
 
 clean:
 	-rm -rf $(BUILD_DIR)
@@ -94,9 +94,14 @@ wrapper:
 	cmake \
 		-S $(DEPS_DIR)/clap-wrapper \
 		-B $(OBJ_DIR)/wrapper \
-		-DCLAP_SDK_ROOT=$(DEPS_DIR)/clap \
-		-DVST3_SDK_ROOT=$(DEPS_DIR)/vst3sdk \
+		-DCLAP_SDK_ROOT=$(shell realpath $(DEPS_DIR)/clap) \
+		-DCLAP_WRAPPER_DOWNLOAD_DEPENDENCIES=TRUE \
+		-DCLAP_WRAPPER_BUILD_AUV2=TRUE \
 		-DCLAP_WRAPPER_OUTPUT_NAME=$(TARGET)
+	cmake --build $(OBJ_DIR)/wrapper
+	mv $(OBJ_DIR)/wrapper/$(TARGET).vst3 $(OBJ_DIR)
+	-mv $(OBJ_DIR)/wrapper/$(TARGET).component $(OBJ_DIR)
+
 
 build-linux:
 	docker build -t $(TARGET) .
